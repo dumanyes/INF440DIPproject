@@ -4,11 +4,12 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.shortcuts import redirect
 
-from photo_filter import views
-
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', lambda request: redirect('upload_photo', permanent=False)),
-    path('photo_filter/', include('photo_filter.urls')),
-    path('about-us/', views.about_us, name='about_us'),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    path('admin/', admin.site.urls),  # Django admin site
+    path('', lambda request: redirect('upload_photo', permanent=False)),  # Redirect root to upload page
+    path('photo_filter/', include('photo_filter.urls')),  # Include photo_filter app URLs
+]
+
+# Serve media files during development (only for DEBUG=True)
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
