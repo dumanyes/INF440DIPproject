@@ -2,8 +2,6 @@ import os
 import logging
 from django.shortcuts import render, redirect, get_object_or_404
 from django.conf import settings
-from django.templatetags.static import static
-
 from .forms import PhotoForm
 from .models import Photo
 from .utils import (
@@ -18,12 +16,12 @@ from .utils import (
 # Configure logging for debugging purposes
 logger = logging.getLogger(__name__)
 
-
+# Upload photo and apply filters
 def upload_photo(request):
     if request.method == 'POST':
         form = PhotoForm(request.POST, request.FILES)
         if form.is_valid():
-            photo = form.save()
+            photo = form.save()  # Save the form (photo) to the database
             original_path = photo.original_image.path
             filtered_dir = os.path.join(settings.MEDIA_ROOT, 'photos', 'filtered')
 
@@ -36,6 +34,7 @@ def upload_photo(request):
             filtered_path = os.path.join(filtered_dir, filtered_filename)
 
             try:
+                # Apply the filter based on the selected filter type
                 if filter_type == 'grayscale':
                     apply_grayscale(original_path, filtered_path)
                 elif filter_type == 'edge_detection':
@@ -59,8 +58,9 @@ def upload_photo(request):
                 # Save the filtered image path in the model
                 relative_filtered_path = os.path.join('photos', 'filtered', filtered_filename)
                 photo.filtered_image.name = relative_filtered_path
-                photo.save()
+                photo.save()  # Save updated photo object with the filtered image path
 
+                # Redirect to the photo detail page
                 return redirect('photo_detail', pk=photo.pk)
             except Exception as e:
                 logger.error(f"Error applying filter: {e}")
@@ -70,11 +70,12 @@ def upload_photo(request):
                     {'form': form, 'error': "An error occurred while applying the filter."}
                 )
     else:
-        form = PhotoForm()
+        form = PhotoForm()  # Create a new form if it's a GET request
 
     return render(request, 'photo_filter/upload.html', {'form': form})
 
 
+# View to show photo details (original and filtered images)
 def photo_detail(request, pk):
     photo = get_object_or_404(Photo, pk=pk)
 
@@ -88,25 +89,22 @@ def photo_detail(request, pk):
     return render(request, 'photo_filter/detail.html', {'photo': photo})
 
 
+# About Us page
 def about_us(request):
-    default_member_image = static('images/mem1.jpg')
-
-    # List of members with their specific images, or use the default image if missing
+    # Example member images
+    default_member_image = "/static/images/default_member.jpg"
     members = [
-        {"image_url": static('images/member1.jpg'), "fullname": "Duman Yessenbay", "id": "210107150",
-         "group": "02-N/07-P"},
-        {"image_url": static('images/member2.jpg'), "fullname": "Omargali Tlepbergenov", "id": "210107016",
-         "group": "02-N/07-P"},
-        {"image_url": static('images/member3.jpg'), "fullname": "Zhassulan Manap", "id": "210103266",
-         "group": "02-N/07-P"},
-        {"image_url": static('images/member4.jpg'), "fullname": "Zanggar Zhazylbekov", "id": "210107070",
-         "group": "02-N/07-P"},
-        {"image_url": static('images/member5.png'), "fullname": "Adilzhan Kuzembayev", "id": "210103451",
-         "group": "02-N/07-P"},
+        {"image_url": "/static/images/member1.jpg", "fullname": "Duman Yessenbay", "id": "210107150", "group": "02-N/07-P"},
+        {"image_url": "/static/images/member2.jpg", "fullname": "Omargali Tlepbergenov", "id": "210107016", "group": "02-N/07-P"},
+        {"image_url": "/static/images/member3.jpg", "fullname": "Zhassulan Manap", "id": "210103266", "group": "02-N/07-P"},
+        {"image_url": "/static/images/member4.jpg", "fullname": "Zanggar Zhazylbekov", "id": "210107070", "group": "02-N/07-P"},
+        {"image_url": "/static/images/member5.png", "fullname": "Adilzhan Kuzembayev", "id": "210103451", "group": "02-N/07-P"},
     ]
 
-    # You can set a default image for members who don't have a specific image
+    # Fallback to a default image if member images are missing
     for member in members:
-        member["image_url"] = member["image_url"] if member.get("image_url") else default_member_image
+        if not os.path.exists(os.path.join(settings.BASE_DIR, member['image_url'][1:])):
+            member['image_url'] = default_member_image
+
     documentation_url = "https://docs.google.com/document/d/1SOhjJYOj7Jj860L72wjiwRS_uYtzNOSmA19oQzCE_Iw/edit?tab=t.0"
     return render(request, 'photo_filter/about_us.html', {"members": members, "documentation_url": documentation_url})

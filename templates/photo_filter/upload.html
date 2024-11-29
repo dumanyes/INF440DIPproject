@@ -8,6 +8,7 @@
 <div class="card shadow-sm p-4 mt-4 mx-auto card-custom" style="max-width: 500px;">
     <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
+        
         <div class="mb-3">
             <label for="id_original_image" class="form-label">Choose an Image</label>
             {{ form.original_image|add_class:"form-control" }}
@@ -28,6 +29,7 @@
         <button type="submit" class="btn btn-custom w-100 btn-rounded">Apply Filter</button>
     </form>
 </div>
+
 <style>
     /* Custom Card Styling */
     .card-custom {
@@ -37,7 +39,6 @@
         transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
     .card-custom:hover {
-        
         box-shadow: 0 12px 20px rgba(0, 0, 0, 0.2), 0 -6px 20px rgba(255, 255, 255, 0.5); /* Enhanced shadow on hover */
     }
 
@@ -50,7 +51,6 @@
     }
     .btn-custom:hover {
         background-color: #0056b3; /* Darker blue for hover */
-        
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Button shadow on hover */
     }
     .btn-rounded {
