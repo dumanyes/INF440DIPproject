@@ -1,15 +1,13 @@
-import os.path
+import os
 from pathlib import Path
-
-
-import env
-from django.conf import ENVIRONMENT_VARIABLE
+import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-%^y2h@l03%8teryd9b^&#tkv=#bxlnc@py6^g%7du7c7(fqhh('
-DEBUG = True
-ALLOWED_HOSTS = ['*']
+
+DEBUG = os.environ.get("DEBUG", False) == "True"
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "").split(" ")
 
 INSTALLED_APPS = [
     'whitenoise.runserver_nostatic',
@@ -20,8 +18,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'photo_filter',
-
-
     'widget_tweaks',
 ]
 
@@ -56,12 +52,18 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'INF440assign.wsgi.application'
 
+# Default database configuration (using SQLite if no DATABASE_URL is provided)
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+# Check if DATABASE_URL is set, otherwise use SQLite
+database_url = os.environ.get('DATABASE_URL')
+if database_url:
+    DATABASES['default'] = dj_database_url.parse(database_url)
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -83,16 +85,11 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-
-
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR / 'static')]
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-STATICSTORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
-
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
