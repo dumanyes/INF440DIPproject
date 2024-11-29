@@ -2,6 +2,8 @@ import os
 import logging
 from django.shortcuts import render, redirect, get_object_or_404
 from django.conf import settings
+from django.templatetags.static import static
+
 from .forms import PhotoForm
 from .models import Photo
 from .utils import (
@@ -87,19 +89,24 @@ def photo_detail(request, pk):
 
 
 def about_us(request):
-    default_member_image = "/static/images/default_member.jpg"
+    default_member_image = static('images/mem1.jpg')
+
+    # List of members with their specific images, or use the default image if missing
     members = [
-        {"image_url": "/static/images/member1.jpg", "fullname": "Duman Yessenbay", "id": "210107150", "group": "02-N/07-P"},
-        {"image_url": "/static/images/member2.jpg", "fullname": "Omargali Tlepbergenov", "id": "210107016", "group": "02-N/07-P"},
-        {"image_url": "/static/images/member3.jpg", "fullname": "Zhassulan Manap", "id": "210103266", "group": "02-N/07-P"},
-        {"image_url": "/static/images/member4.jpg", "fullname": "Zanggar Zhazylbekov", "id": "210107070", "group": "02-N/07-P"},
-        {"image_url": "/static/images/member5.png", "fullname": "Adilzhan Kuzembayev", "id": "210103451", "group": "02-N/07-P"},
+        {"image_url": static('images/member1.jpg'), "fullname": "Duman Yessenbay", "id": "210107150",
+         "group": "02-N/07-P"},
+        {"image_url": static('images/member2.jpg'), "fullname": "Omargali Tlepbergenov", "id": "210107016",
+         "group": "02-N/07-P"},
+        {"image_url": static('images/member3.jpg'), "fullname": "Zhassulan Manap", "id": "210103266",
+         "group": "02-N/07-P"},
+        {"image_url": static('images/member4.jpg'), "fullname": "Zanggar Zhazylbekov", "id": "210107070",
+         "group": "02-N/07-P"},
+        {"image_url": static('images/member5.png'), "fullname": "Adilzhan Kuzembayev", "id": "210103451",
+         "group": "02-N/07-P"},
     ]
 
-    # Fallback to a default image if member images are missing
+    # You can set a default image for members who don't have a specific image
     for member in members:
-        if not os.path.exists(os.path.join(settings.BASE_DIR, member['image_url'][1:])):
-            member['image_url'] = default_member_image
-
+        member["image_url"] = member["image_url"] if member.get("image_url") else default_member_image
     documentation_url = "https://docs.google.com/document/d/1SOhjJYOj7Jj860L72wjiwRS_uYtzNOSmA19oQzCE_Iw/edit?tab=t.0"
     return render(request, 'photo_filter/about_us.html', {"members": members, "documentation_url": documentation_url})
