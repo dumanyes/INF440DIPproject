@@ -10,4 +10,5 @@ utils==1.0.2
 whitenoise==6.8.2
 gunicorn
 dj-database-url
-
+psycopg
+psycopg2-binary
