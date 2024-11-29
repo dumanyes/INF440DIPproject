@@ -16,6 +16,20 @@ from .utils import (
 # Configure logging for debugging purposes
 logger = logging.getLogger(__name__)
 
+def save_filtered_image(photo, filtered_image):
+    # Define the save path
+    filtered_path = f'photos/filtered/filtered_{photo.original_image.name}'
+    filtered_full_path = os.path.join(settings.MEDIA_ROOT, filtered_path)
+
+    # Ensure directories exist
+    os.makedirs(os.path.dirname(filtered_full_path), exist_ok=True)
+
+    # Save the filtered image to the defined path
+    filtered_image.save(filtered_full_path)
+
+    # Update the model instance
+    photo.filtered_image.name = filtered_path
+    photo.save()
 # Upload photo and apply filters
 def upload_photo(request):
     if request.method == 'POST':
